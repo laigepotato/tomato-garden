@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f8f6ee">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>番茄花园 · 专注种花</title>
+<style>
+:root{color-scheme:light;--paper:#f8f6ee;--card:#fffcf5;--ink:#233f30;--muted:#566556;--line:#dfdfd0;--green:#28553d;--accent:#a84a39;--soft:#e9efdf}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}button,select{font:inherit}button,select{cursor:pointer}button:disabled{cursor:default}button:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:3px}header,main,footer{width:min(1040px,calc(100% - 40px));margin-inline:auto}
+header{padding:24px 0 19px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.08em}.brand-mark{width:28px;height:28px;color:var(--accent)}.badge,.stage{border-radius:999px;background:var(--soft);padding:6px 11px;font-size:12px;font-weight:750;white-space:nowrap}
+.intro{padding:28px 0 22px}.eyebrow{font-size:12px;letter-spacing:.13em;color:var(--accent);font-weight:850}h1{font-family:Georgia,"Songti SC",serif;letter-spacing:-.045em;font-size:clamp(33px,6vw,58px);margin:4px 0 9px}h2,h3,p{margin:0}p{line-height:1.65;color:var(--muted)}h2{font-size:21px}.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:18px}.card{border:1px solid var(--line);border-radius:24px;background:var(--card);overflow:hidden}.grow-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:19px 22px 13px}.grow-head p{font-size:12px}.scene{height:200px;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 85%,#e0e8cc,#eef0e1 64%,#f4f4e9);position:relative;overflow:hidden}.scene::before,.scene::after{content:"";position:absolute;width:65%;height:74px;bottom:-53px;background:#d3dfc1;border-radius:50%}.scene::before{left:-15%}.scene::after{right:-16%}.plant-art{width:100%;height:100%;max-width:240px;display:block;position:relative;z-index:1}.progress-block{padding:16px 22px 19px}.progress-top{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:14px;font-weight:780}.progress-top span{font-variant-numeric:tabular-nums}.segments{display:flex;gap:5px;margin:9px 0 7px}.segments i{flex:1;height:6px;border-radius:6px;background:#e7e6d9}.segments i.filled{background:#61825d}.hint{font-size:13px}.plant-controls{margin-top:10px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.plant-controls[hidden]{display:none}.plant-controls label{font-size:13px}.plant-controls select{color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.timer-card{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 18px}.timer-card>p{font-size:13px}.dial{position:relative;width:165px;height:165px;display:grid;place-items:center;margin:14px 0}.dial svg{position:absolute;inset:0;transform:rotate(-90deg)}.dial circle{fill:none;stroke-width:4.5}.track{stroke:#eae8db}.meter{stroke:#65855e;stroke-linecap:round}.digits{font-size:48px;line-height:1;font-weight:740;font-variant-numeric:tabular-nums;letter-spacing:-.065em}.primary,.secondary{border-radius:10px;padding:10px 17px;font-weight:780}.primary{border:1px solid var(--green);background:var(--green);color:#fffdf5}.primary:hover{background:#1f4732}.primary:disabled{background:#e5e9dd;border-color:#e5e9dd;color:#596455}.secondary{background:var(--card);border:1px solid var(--line);color:var(--ink)}#action{min-width:152px}.status{min-height:2.7em;margin:10px 0 0;max-width:260px;display:grid;place-items:center}
+.garden{margin-top:18px;padding:19px 22px}.garden-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.beds{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.bed{background:#eff1e5;border:1px solid #dfe5d4;border-radius:16px;min-width:0;display:grid;justify-items:center;text-align:center;padding:8px 4px 12px}.bed .plant-art{height:92px;max-width:120px}.bed h3{font-size:14px}.bed p{font-size:12px}footer{padding:15px 0 24px;font-size:12px;color:var(--muted)}dialog{max-width:calc(100% - 36px);border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:18px;padding:22px}dialog::backdrop{background:#233f3066}dialog form{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}dialog p{margin-top:6px}
+footer a{display:inline-block;margin-inline-start:12px;color:var(--green);text-underline-offset:3px}
+.save-tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.save-tools button{font-size:12px;padding:6px 10px}
+#save-feedback:not(:empty){margin-top:6px}
+.scene{height:227px;background:radial-gradient(ellipse at 50% 43%,#fff9df 0%,#fff9df00 51%),linear-gradient(145deg,var(--flower-wash,#f4eddb),#e9efdf 86%)}
+.scene .plant-art{max-width:282px}
+.scene[data-stage="seed"] .plant-art{transform:translateY(-20px) scale(1.18)}
+.focus-entry{
+  display:grid;align-content:center;justify-items:center;text-align:center;
+  padding:26px 20px;background:radial-gradient(ellipse at 50% 15%,#fffdf6,#f4efe0);
+}
+.focus-mark{
+  display:grid;place-items:center;width:56px;height:56px;margin-bottom:12px;
+  border:1px solid #e9cebf;border-radius:50%;background:#faebdf;color:var(--accent);
+}
+.focus-mark svg{width:34px;height:34px}
+.focus-entry h2,.timer-card h2{font-family:Georgia,"Songti SC",serif;letter-spacing:-.04em}
+.focus-entry h2{font-size:25px}
+.focus-entry p{font-size:13px}
+.focus-entry #action{margin-top:15px}
+.focus-entry .status{margin:13px 0 0;max-width:245px}
+.focus-overlay{
+  width:440px;padding:0;border:1px solid #f3e8d3;border-radius:28px;
+  box-shadow:0 25px 85px #17271e69;overscroll-behavior:contain;
+}
+.focus-overlay::backdrop{background:#243c31c9;backdrop-filter:blur(4px)}
+.timer-card{
+  position:relative;isolation:isolate;padding:26px 18px 22px;
+  background:radial-gradient(ellipse at 50% 36%,#fffefa 10%,#fbf5e8 80%);
+}
+.timer-decoration{position:absolute;inset:auto 0 0;width:100%;height:59%;z-index:-1;pointer-events:none;opacity:.40}
+.timer-kicker{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+  border-radius:999px;background:#f6e5da;color:#8e4635;font-size:12px;font-weight:750;
+}
+.timer-kicker::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.timer-card h2{margin:8px 0 0;font-size:clamp(22px,6vw,30px)}
+.timer-card .dial{
+  width:188px;height:188px;margin:14px 0 12px;border-radius:50%;
+  background:radial-gradient(circle,#fffdf6 61%,#f4ebdb 100%);
+}
+.timer-card .track{stroke:#ecdfcc}
+.timer-card .meter{stroke:#b8654d}
+.timer-card .digits{font-size:clamp(42px,13vw,53px);font-weight:780}
+.focus-note{max-width:290px;margin:0 0 8px;text-wrap:balance}
+.timer-card #stop{padding:7px 12px;border-color:transparent;background:transparent;color:var(--muted);font-size:13px}
+.timer-card #stop:hover{background:#f1e8d8;color:var(--ink)}
+body:has(.focus-overlay[open]){overflow:hidden}
+.beds{gap:12px}
+.bed{position:relative;padding:10px 5px 12px;background:radial-gradient(ellipse at 50% 25%,#fffdf5,var(--flower-wash));border-color:var(--line)}
+.bed .plant-art{height:105px}
+.bed.current{border-color:#91aa82}
+.bed.empty{min-height:170px;align-items:center;background:radial-gradient(ellipse at 50% 36%,#f7f7ec,#edf0e2)}
+.empty-bed-art{width:100%;height:82px;max-width:136px}
+.bed.empty:nth-child(even) .empty-bed-art{transform:scaleX(-1)}
+.bed h3{margin-top:2px}
+.bed-label{border-radius:999px;background:#fffdf5bd;padding:2px 8px;font-size:11px;font-weight:750;color:var(--green)}
+@media(max-width:620px){
+  header,main,footer{width:calc(100% - 28px)}
+  header{padding:15px 0}.intro{padding:19px 0 16px}.grid{grid-template-columns:1fr;gap:12px}
+  .focus-entry{
+    order:-1;grid-template-columns:auto minmax(0,1fr) auto;
+    gap:8px 11px;align-items:center;justify-items:start;text-align:left;padding:14px;
+  }
+  .focus-mark{width:42px;height:42px;margin:0}.focus-mark svg{width:26px;height:26px}
+  .focus-entry h2{font-size:19px}.focus-entry .focus-copy p{font-size:12px}
+  .focus-entry #action{min-width:0;margin:0;padding:9px 12px;font-size:14px;white-space:nowrap}
+  .focus-entry .status{grid-column:1/-1;min-height:0;max-width:none;margin:0;font-size:12px}
+  .timer-card .dial{width:164px;height:164px;margin:11px 0 9px}
+  .timer-card .digits{font-size:43px}
+  .beds{grid-template-columns:repeat(2,minmax(0,1fr))}.garden{margin-top:12px}.scene{height:175px}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="brand"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 11c-3-2-8-3-11 2-4 7 3 14 11 14s15-7 11-14c-3-5-8-4-11-2z"/><path fill="#3e6747" d="M16 12c-4 0-7-2-8-4 3-1 6 0 8 2-1-3 0-5 2-7l1 1c-1 2-2 4-1 6 2-2 5-2 7-1-2 2-5 3-9 3z"/></svg>番茄花园</div>
+<div class="badge" id="total">累计专注 0 次</div>
+</header>
+<main>
+<section class="intro">
+<div class="eyebrow">从一粒种子开始</div>
+<h1>把时间种成花！</h1>
+<p id="intro-text">每完成一次 25 分钟专注，植物就长大一点。养成后，把它种进自己的花园。</p>
+</section>
+<div class="grid">
+<section class="card" aria-labelledby="plant-title">
+<div class="grow-head"><div><p>正在培育</p><h2 id="plant-title">小雏菊</h2></div><span class="stage" id="stage">种子</span></div>
+<div class="scene" id="scene"></div>
+<div class="progress-block">
+<div class="progress-top"><span>生长进度</span><span id="progress-text">0 / 3 次</span></div>
+<div class="segments" id="progress" role="progressbar" aria-label="生长进度" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0"></div>
+<p class="hint" id="growth-hint">再完成 3 次专注，小雏菊就会开花。</p>
+<div class="plant-controls" id="plant-controls" hidden><button class="primary" id="plant">种进花园</button></div>
+<div class="plant-controls" id="species-controls" hidden><label for="species">下一株想养</label><select id="species"></select></div>
+</div>
+</section>
+<section class="card focus-entry" aria-labelledby="focus-title">
+<div class="focus-mark" aria-hidden="true">
+<svg viewBox="0 0 32 32"><path fill="currentColor" d="M16 11c-3-2-8-3-11 2-4 7 3 14 11 14s15-7 11-14c-3-5-8-4-11-2z"/><path fill="#4f7552" d="M16 12c-4 0-7-2-8-4 3-1 6 0 8 2-1-3 0-5 2-7l1 1c-1 2-2 4-1 6 2-2 5-2 7-1-2 2-5 3-9 3z"/><path d="M9 15q-2 2-1 5" fill="none" stroke="#f4b6a2" stroke-width="1.5" stroke-linecap="round"/></svg>
+</div>
+<div class="focus-copy"><h2 id="focus-title">专注时间</h2>
+<p id="timer-description">每次 25 分钟</p></div>
+<button class="primary" id="action" aria-haspopup="dialog">开始专注</button>
+<p class="status" id="status" role="status"></p>
+</section>
+</div>
+<section class="card garden" aria-labelledby="garden-title">
+<div class="garden-head"><h2 id="garden-title">我的花园</h2><div class="badge" id="garden-count">0 株植物</div></div>
+<div class="beds" id="beds"></div>
+</section>
+</main>
+<footer>
+进度保存在当前浏览器里。<a id="mode-link" href="?mode=test">进入测试模式（每次 5 秒）</a>
+<div class="save-tools">
+<button class="secondary" id="export-save">导出花园</button>
+<button class="secondary" id="import-save">导入花园</button>
+<input id="save-file" type="file" accept=".json,application/json" hidden>
+<button class="secondary" id="update-app" hidden>应用更新</button>
+</div>
+<p id="save-feedback" role="status"></p>
+</footer>
+<dialog class="focus-overlay" id="focus-overlay" aria-labelledby="timer-title">
+<div class="timer-card">
+<svg class="timer-decoration" viewBox="0 0 420 210" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+<defs><g id="timer-tomato">
+<path d="M0-20c-13-10-36-5-44 11-11 24 9 50 34 48 4 0 7-1 10-2 4 1 7 2 11 2 25 2 45-24 34-48-8-16-31-21-45-11Z" fill="#eda18e" stroke="#cb7768" stroke-width="1.7"/>
+<path d="M-35-5c5-11 16-15 26-13m-23 34c4 6 8 9 12 10" fill="none" stroke="#fff4dc" stroke-width="3" stroke-linecap="round"/>
+<path d="M0-19c-8-7-18-8-27-6 7 4 12 7 17 12-3 1-5 4-6 8 8-1 13-4 16-9 6 5 11 7 19 6-3-4-6-7-10-9 6-1 12-5 17-10-10 0-18 2-23 7-1-9 1-15 4-20l-5-3c-6 9-6 16-2 24Z" fill="#8ca77c"/>
+</g></defs>
+<path d="M-10 155q32-48 75-51m-58 26q18-5 33-19M377 207q4-39 47-58" stroke="#a9b391" stroke-width="2" fill="none"/>
+<use href="#timer-tomato" transform="translate(32 173) rotate(-20) scale(1.28)"/>
+<use href="#timer-tomato" transform="translate(90 202) rotate(15) scale(.57)"/>
+<use href="#timer-tomato" transform="translate(390 178) rotate(18) scale(1.05)"/>
+</svg>
+<span class="timer-kicker" id="timer-kicker">专注中</span>
+<h2 id="timer-title" tabindex="-1" autofocus>给花一点时间</h2>
+<div class="dial">
+<svg viewBox="0 0 165 165" aria-hidden="true"><circle class="track" cx="82.5" cy="82.5" r="78"/><circle class="meter" id="meter" cx="82.5" cy="82.5" r="78" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"/></svg>
+<div class="digits" id="time" role="timer">25:00</div>
+</div>
+<p class="focus-note">保持页面在前台，专注完成后植物会生长。</p>
+<button class="secondary" id="stop" aria-haspopup="dialog">提前结束</button>
+</div>
+</dialog>
+<dialog id="confirm" aria-labelledby="confirm-title"><h2 id="confirm-title">结束这轮专注？</h2><p>本轮不会增加生长进度。</p><form method="dialog"><button class="secondary" value="keep" autofocus>继续专注</button><button class="primary" value="stop">结束本轮</button></form></dialog>
+<script>
+const plants = [
+  {kind:"daisy", name:"小雏菊", need:3, petal:"#fffcf0", wash:"#f3efdb"},
+  {kind:"cornflower", name:"矢车菊", need:4, petal:"#7286cc", wash:"#e6eaf6"},
+  {kind:"calendula", name:"金盏花", need:5, petal:"#eca250", wash:"#fae9d2"},
+  {kind:"lavender", name:"薰衣草", need:6, petal:"#9c7fb5", wash:"#eee7f4"},
+  {kind:"tulip", name:"郁金香", need:5, petal:"#db7188", wash:"#f6e2e4"},
+  {kind:"hydrangea", name:"绣球花", need:6, petal:"#9b9dd1", wash:"#e4eaf7"},
+  {kind:"cosmos", name:"波斯菊", need:7, petal:"#e68bac", wash:"#f6e7ed"},
+  {kind:"sunflower", name:"向日葵", need:8, petal:"#efbd43", wash:"#f8edce"}
+];
+const testMode = new URLSearchParams(location.search).get("mode") === "test";
+const duration = testMode ? 5 * 1000 : 25 * 60 * 1000;
+const key = testMode ? "tomato-garden-test-v1" : "tomato-garden-v1";
+const empty = {species:0, growth:0, completed:0, garden:plants.map(() => 0), active:null, message:""};
+const defaultMessage = "专注期间离开页面、切屏或关闭，本轮不会增加进度。";
+const byId = id => document.getElementById(id);
+const action = byId("action");
+const focusOverlay = byId("focus-overlay");
+const stop = byId("stop");
+const plantButton = byId("plant");
+const picker = byId("species");
+const dialog = byId("confirm");
+const exportSave = byId("export-save");
+const importSave = byId("import-save");
+const saveFile = byId("save-file");
+const feedback = byId("save-feedback");
+const updateApp = byId("update-app");
+const saveMode = testMode ? "test" : "normal";
+let state = empty;
+let runId = null;
+let timer;
+let unavailable = false;
+let gardenRendered = "";
+let applyingUpdate = false;
+
+if (testMode) {
+  document.title = "番茄花园 · 测试模式";
+  byId("intro-text").textContent = "每轮 5 秒，快速体验养花和移栽。测试进度单独保存。";
+  byId("timer-kicker").textContent = "专注中 · 测试模式";
+  byId("timer-description").textContent = "测试模式 · 每次 5 秒";
+  const modeLink = byId("mode-link");
+  modeLink.href = "?";
+  modeLink.textContent = "返回正式模式（每次 25 分钟）";
+}
+
+function read() {
+  const saved = localStorage.getItem(key);
+  if (!saved) return empty;
+  return migrate({...empty, ...JSON.parse(saved)});
+}
+
+function migrate(previous) {
+  if (previous.garden.length === plants.length) return previous;
+  const garden = plants.map((_, i) => previous.garden[i] ?? 0);
+  const next = garden.findIndex(count => count === 0);
+  const hasFinishedOldCollection = previous.garden.every(count => count > 0);
+  const canSwitchToNewPlant = hasFinishedOldCollection && next >= 0 && !previous.growth && !previous.active;
+  return {...previous, garden, species:canSwitchToNewPlant ? next : previous.species};
+}
+
+function backupProgress({species, growth, completed, garden}) {
+  return {species, growth, completed, garden};
+}
+
+function parseBackup(text) {
+  const backup = JSON.parse(text);
+  if (backup?.format !== "tomato-garden" || backup.version !== 1) {
+    throw new Error("请选择番茄花园导出的存档。");
+  }
+  if (backup.mode !== saveMode) {
+    throw new Error(testMode ? "请切回正式模式导入这份存档。" : "请切换到测试模式导入这份存档。");
+  }
+  const {species, growth, completed, garden} = backup.progress ?? {};
+  const validCount = value => Number.isSafeInteger(value) && value >= 0;
+  if (!validCount(species) || !plants[species] || !Array.isArray(garden) ||
+      ![4, plants.length].includes(garden.length) || species >= garden.length ||
+      !garden.every(validCount) || !validCount(growth) || growth > plants[species].need ||
+      !validCount(completed) || completed < growth) {
+    throw new Error("存档中的花园进度无效。");
+  }
+  return migrate({...empty, species, growth, completed, garden});
+}
+
+exportSave.addEventListener("click", () => {
+  try {
+    const progress = backupProgress(read());
+    const backup = {format:"tomato-garden", version:1, mode:saveMode, progress};
+    const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], {type:"application/json"}));
+    const link = document.createElement("a");
+    link.href = url;
+    const date = new Date().toISOString().slice(0, 10);
+    link.download = "番茄花园-" + (testMode ? "测试-" : "") + date + ".json";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    feedback.textContent = "花园存档已生成。";
+  } catch {
+    feedback.textContent = "无法导出花园，请检查浏览器的本地存储。";
+  }
+});
+
+importSave.addEventListener("click", () => saveFile.click());
+saveFile.addEventListener("change", async () => {
+  const file = saveFile.files[0];
+  saveFile.value = "";
+  if (!file) return;
+  try {
+    if (file.size > 65536) throw new Error("请选择番茄花园导出的存档。");
+    const incoming = parseBackup(await file.text());
+    const current = read();
+    if (current.active || applyingUpdate) throw new Error("请在本轮专注或更新结束后导入。");
+    if (current.completed || current.growth || current.garden.some(Boolean)) {
+      if (!window.confirm("导入会用文件里的花园替换当前进度。要继续吗？")) return;
+    }
+    if (read().active) throw new Error("请在本轮专注结束后导入。");
+    save({...incoming, message:"花园存档已恢复。"});
+    feedback.textContent = "已导入花园存档。";
+  } catch (error) {
+    feedback.textContent = error instanceof SyntaxError ? "请选择有效的花园存档文件。" : error.message;
+  }
+});
+
+function storageFailure() {
+  unavailable = true;
+  clearInterval(timer);
+  closeFocus();
+  action.disabled = true;
+  plantButton.disabled = true;
+  picker.disabled = true;
+  byId("status").textContent = "当前浏览器无法保存进度。请允许本地存储后重新打开。";
+}
+
+function closeFocus() {
+  if (dialog.open) dialog.close();
+  if (focusOverlay.open) focusOverlay.close();
+}
+
+function save(next) {
+  localStorage.setItem(key, JSON.stringify(next));
+  state = next;
+  render();
+}
+
+function petals(count, markup, offset = 0) {
+  return Array.from({length:count}, (_, i) =>
+    '<g transform="rotate(' + (offset + i * 360 / count) + ')">' + markup + '</g>'
+  ).join("");
+}
+
+function bloom(plant) {
+  switch (plant.kind) {
+    case "daisy":
+      return petals(13, '<path d="M0 2C-4-3-6-13-5-21Q-4-28 0-28Q5-28 5-21C6-13 4-3 0 2Z" fill="#fffdf5" stroke="#d9d6c4" stroke-width=".65"/><path d="M0-6V-23" stroke="#e8ddc9" stroke-width=".65"/>') +
+        '<circle r="8" fill="#e4a93e"/><circle r="6" fill="#f4c858"/>' +
+        petals(8, '<circle cy="-4.7" r=".85" fill="#b37734"/>');
+    case "cornflower":
+      return petals(9, '<path d="M0 3Q-7-5-10-19L-6-17-7-23-2-21 0-26 3-20 7-23 7-17 11-19Q6-5 0 3Z" fill="#7188d4" stroke="#5264ac" stroke-width=".65"/><path d="M0-3-3-18M1-3l4-14" stroke="#a9bae9" stroke-width=".85"/>') +
+        petals(8, '<path d="M0 2Q-5-5 0-12Q6-8 0 2Z" fill="#a4afe5"/>', 20) +
+        '<circle r="5" fill="#505289"/><circle cx="-1" cy="-2" r="1.7" fill="#e0c8e8"/>';
+    case "calendula":
+      return petals(14, '<path d="M0 3Q-8-8-7-20Q-7-25-2-25L0-23 3-25Q8-24 7-19 8-9 0 3Z" fill="#e88938" stroke="#d17a35" stroke-width=".65"/>') +
+        petals(12, '<path d="M0 2Q-7-7-5-18L-2-20 0-18 3-20 5-17Q7-9 0 2Z" fill="#ffbf65" stroke="#e99545" stroke-width=".55"/>', 15) +
+        petals(9, '<ellipse cy="-8" rx="3.5" ry="6.5" fill="#ffd27a"/>') + '<circle r="5" fill="#aa5831"/>';
+    case "lavender": {
+      const florets = [[-15,5],[-16,-1],[-12,-8],[-9,4],[0,6],[-5,-1],[5,-4],[-5,-9],[4,-12],[0,-20],[16,9],[17,2],[13,-5]];
+      return '<path d="M0 10V-20M0 18Q-12 13-15-6M0 22Q14 15 16-1" fill="none" stroke="#567c52" stroke-width="1.6"/>' +
+        florets.map(([x,y], i) => '<g transform="translate(' + x + ' ' + y + ') rotate(' + (i % 2 ? 25 : -25) + ')"><ellipse rx="4.5" ry="6.5" fill="' + (i % 2 ? "#a381c7" : "#805aa8") + '"/><ellipse cy="-2" rx="2.1" ry="2.8" fill="#c6a8dd" opacity=".65"/></g>').join("");
+    }
+    case "tulip":
+      return '<path d="M0 9C-15 8-24-7-20-25Q-10-19-4-11Q2-28 12-29 17-23 18-18Q21-23 24-24C27-4 15 11 0 9Z" fill="#b44860"/>' +
+        '<path d="M0 9C-11 8-22-7-20-25-6-23 0-9 0 9Z" fill="#e77d8d"/><path d="M0 9C-6-2-9-13-6-24Q8-22 12-10 15-20 24-24C26-5 15 11 0 9Z" fill="#d85b78"/>' +
+        '<path d="M2 6Q8-8 20-17M-4 5Q-13-6-16-19" fill="none" stroke="#f69aa6" stroke-width="1.2" stroke-linecap="round"/>';
+    case "hydrangea": {
+      const clusters = [[-23,-3],[-17,-16],[-4,-22],[9,-21],[22,-11],[25,1],[17,10],[4,13],[-10,11],[-22,8],[-10,-7],[4,-9],[14,0],[-3,3]];
+      return clusters.map(([x,y], i) => '<g transform="translate(' + x + ' ' + y + ') rotate(' + i * 17 + ')" fill="' + ["#8399cd","#9e9bd3","#b3b2e5","#708dc5"][i % 4] + '">' +
+        '<path d="M0 0C-10-4-6-12 0-5 6-12 10-4 4 0 11 6 3 10 0 5-4 11-11 4 0 0Z" stroke="#697db4" stroke-width=".5"/><circle r="1.4" fill="#f9ead6"/></g>').join("");
+    }
+    case "cosmos":
+      return petals(8, '<path d="M0 3Q-6-6-10-21L-7-25-3-24 0-27 3-25 7-25 10-21Q6-6 0 3Z" fill="#e68bac" stroke="#c96891" stroke-width=".65"/><path d="M0-3-4-19M1-3l4-18" stroke="#b84d7b" stroke-opacity=".55" stroke-width=".85"/>') +
+        '<circle r="7" fill="#9d5171"/><circle r="5.2" fill="#edb248"/>' +
+        petals(6, '<circle cy="-3.4" r="1.25" fill="#ffdb7a"/>');
+    case "sunflower":
+      return petals(16, '<path d="M0 4C-8-4-8-20 0-29 8-19 7-4 0 4Z" fill="#e89d31" stroke="#d28a2a" stroke-width=".6"/>') +
+        petals(14, '<path d="M0 2C-6-4-5-18 0-25 7-17 6-4 0 2Z" fill="#f9c94e"/><path d="M0-8V-20" stroke="#e1a73b" stroke-width=".65"/>', 12) +
+        '<circle r="13" fill="#734c34" stroke="#c47a39" stroke-width="2"/>' +
+        petals(14, '<circle cy="-9.4" r="1.1" fill="#c89455"/><circle cx="1" cy="-6.4" r=".8" fill="#a67546"/>') +
+        petals(7, '<circle cy="-3" r=".85" fill="#c28b51"/>');
+  }
+}
+
+function foliage(kind) {
+  if (kind === "tulip") {
+    return '<path d="M99 108Q78 97 68 65 90 70 100 108Z" fill="#70976f"/><path d="M100 109Q105 77 132 61 123 97 100 109Z" fill="#54835e"/><path d="M100 107 75 75m26 32 23-35" stroke="#9cbb87" fill="none" stroke-width="1.1"/>';
+  }
+  if (kind === "lavender" || kind === "cosmos") {
+    return '<path d="M100 96Q84 91 76 78 92 83 100 96Zm0 7q12-18 27-20-7 15-27 20Zm0-16Q89 80 86 69 97 75 100 87Z" fill="#7a9b69"/><path d="M99 106 77 84m23 20 21-18" fill="none" stroke="#668759" stroke-width="1"/>';
+  }
+  return '<path d="M99 93Q75 96 62 75 86 68 99 93Z" fill="#81a371"/><path d="M100 102Q110 78 139 81 128 104 100 102Z" fill="#638c60"/><path d="M97 92 69 77m31 24 31-17" stroke="#4f7955" stroke-width="1.05" fill="none"/><path d="m82 84-3-6m8 10-8 1m35 6 1-7m4 4 7 1" stroke="#c1d0a0" stroke-width=".7" fill="none"/>';
+}
+
+function illustration(plant, stage, miniature = false) {
+  const viewBox = miniature ? "42 8 116 146" : "0 0 200 160";
+  const soil = '<ellipse cx="100" cy="139" rx="45" ry="9" fill="#d5debd"/><ellipse cx="100" cy="136" rx="29" ry="6.5" fill="#ac8966"/><path d="M78 136l5-1m7 4 4 1m14-5 5 1" stroke="#d7b888" stroke-linecap="round"/><path d="M64 138l-4-5m5 5 3-7m68 8 4-5m-5 5-2-5" stroke="#91a574" fill="none" stroke-linecap="round"/>';
+  const pot = '<ellipse cx="100" cy="150" rx="51" ry="7" fill="#6e7254" opacity=".13"/><path d="M71 114h58l-7 29q-22 9-44 0Z" fill="#bd795f" stroke="#a9644d" stroke-width="1.2"/><path d="M76 118h22l-1 30q-12-1-19-5Z" fill="#e6a387" opacity=".7"/><path d="M81 127q18 5 38 0m-36 6q17 5 34 0" stroke="#ebad90" fill="none" stroke-width=".9" opacity=".8"/><ellipse cx="100" cy="112" rx="34" ry="9" fill="#e0a38a" stroke="#a9644d" stroke-width="1.2"/><ellipse cx="100" cy="111" rx="28" ry="5.8" fill="#957053"/>';
+  let growth;
+  if (stage === "seed") {
+    growth = '<path d="M93 109Q98 102 107 106 107 114 97 114 94 113 93 109Z" fill="#624731"/><path d="M96 110q4-4 8-3" fill="none" stroke="#ceac7e" stroke-width="1.15" stroke-linecap="round"/>';
+  } else if (stage === "sprout") {
+    growth = '<path d="M100 111Q96 91 100 79" fill="none" stroke="#537f51" stroke-width="3" stroke-linecap="round"/><path d="M99 90Q80 88 80 75 95 75 99 90Zm1-5q4-16 19-17-1 15-19 17Z" fill="#80a46c"/><path d="M98 89 85 78m16 5 14-11" stroke="#557e51" fill="none" stroke-width="1"/>';
+  } else {
+    const base = miniature ? 136 : 111;
+    const head = stage === "bud"
+      ? '<path d="M0 5C-10 2-12-8-10-14Q0-10 0-23Q10-19 12-10 12 0 0 5Z" fill="' + plant.petal + '"/><path d="M0 7Q-12 5-12-7-5-5 0 2q5-8 13-12Q13 3 0 7Z" fill="#72945f"/>'
+      : bloom(plant);
+    growth = '<path d="M100 ' + base + 'Q94 84 100 46" fill="none" stroke="#53794e" stroke-width="3.6" stroke-linecap="round"/>' +
+      foliage(plant.kind) + '<g transform="translate(100 44)">' + head + '</g>';
+  }
+  return '<svg class="plant-art" viewBox="' + viewBox + '" aria-hidden="true">' + (miniature ? soil : pot) + growth + '</svg>';
+}
+
+function renderTime(remaining) {
+  const seconds = Math.ceil(Math.max(0, remaining) / 1000);
+  const two = n => String(n).padStart(2, "0");
+  byId("time").textContent = two(Math.floor(seconds / 60)) + ":" + two(seconds % 60);
+  byId("meter").setAttribute("stroke-dashoffset", String(100 * (1 - Math.max(0, Math.min(duration, remaining)) / duration)));
+}
+
+function render() {
+  const current = plants[state.species];
+  const ready = state.growth >= current.need;
+  const active = Boolean(state.active);
+  const localRun = active && state.active.id === runId;
+  const allUnlocked = state.garden.every(count => count > 0);
+  const phase = ready ? "bloom" : state.growth === 0 ? "seed" : state.growth < Math.ceil(current.need / 2) ? "sprout" : "bud";
+  const phaseNames = {seed:"种子", sprout:"发芽", bud:"花苞", bloom:"开花了"};
+  byId("total").textContent = "累计专注 " + state.completed + " 次";
+  byId("plant-title").textContent = current.name;
+  byId("stage").textContent = phaseNames[phase];
+  const scene = byId("scene");
+  scene.style.setProperty("--flower-wash", current.wash);
+  scene.setAttribute("data-stage", phase);
+  scene.innerHTML = illustration(current, phase);
+  byId("progress-text").textContent = state.growth + " / " + current.need + " 次";
+  byId("progress").setAttribute("aria-valuemax", current.need);
+  byId("progress").setAttribute("aria-valuenow", state.growth);
+  byId("progress").innerHTML = Array.from({length:current.need}, (_, i) => i < state.growth ? '<i class="filled"></i>' : "<i></i>").join("");
+  byId("growth-hint").textContent = ready ? "这株已经养成，可以移栽到花园了。" :
+    "再完成 " + (current.need - state.growth) + " 次专注，" + current.name + "就会开花。";
+  byId("plant-controls").hidden = !ready;
+  byId("species-controls").hidden = !allUnlocked || ready || active || state.growth > 0;
+  picker.value = String(state.species);
+  action.disabled = unavailable || ready || active || applyingUpdate;
+  importSave.disabled = active || applyingUpdate;
+  updateApp.disabled = active || applyingUpdate;
+  action.textContent = ready ? "等待移栽" : "开始专注";
+  byId("status").textContent = active && !localRun ? "另一个页面正在专注。" : state.message || defaultMessage;
+  if (localRun) {
+    renderTime(state.active.deadline - Date.now());
+    if (!focusOverlay.open) focusOverlay.showModal();
+  } else if (focusOverlay.open) {
+    closeFocus();
+    if (!document.hidden && ready) plantButton.focus();
+    else if (!document.hidden && !action.disabled) action.focus();
+  }
+  const gardenKey = state.garden.join(",") + ":" + state.species;
+  if (gardenKey !== gardenRendered) {
+    gardenRendered = gardenKey;
+    byId("garden-count").textContent = state.garden.reduce((sum, count) => sum + count, 0) + " 株植物";
+    byId("beds").innerHTML = plants.map((plant, i) => {
+      const count = state.garden[i];
+      const current = i === state.species;
+      if (!count) {
+        return '<div class="bed empty" aria-hidden="true"><svg class="empty-bed-art" viewBox="0 0 120 72">' +
+          '<ellipse cx="60" cy="44" rx="43" ry="15" fill="#dfe8cf"/>' +
+          '<path d="M28 43c0-7 14-13 32-13s32 6 32 13v3c0 6-14 11-32 11S28 52 28 46Z" fill="#b39674"/>' +
+          '<ellipse cx="60" cy="43" rx="32" ry="13" fill="#cbb08d"/>' +
+          '<path d="M37 44c4-4 12-7 23-7m-14 9 6 1m9 3 5-1m4-7 6 1m-16-2 2 1" fill="none" stroke="#e5d1af" stroke-width="1.2" stroke-linecap="round"/>' +
+          '<path d="M24 45q-7-5-7-12 6 3 8 11-1-10 4-16 2 9-3 17 5-6 9-5-3 6-9 7Zm67 4q-4-5-3-10 4 3 5 9 1-10 8-14-1 9-7 15 5-4 9-2-4 5-11 4Z" fill="#83a06e"/>' +
+          '<path d="M34 33q-4-3-4-7 4 2 5 6 0-6 4-8 1 5-3 9Zm43-2q-3-4-2-8 4 3 4 7 2-6 6-7-1 6-5 9ZM44 57q-3-4-2-7 4 3 4 7 1-4 5-5-1 5-5 6Z" fill="#a0b789"/>' +
+          '<path d="M20 54q2-4 6-3 3 1 3 4-6 2-9-1Zm59 4q3-5 7-3 2 1 2 3-5 3-9 0Zm18-16q1-3 4-3 2 1 3 3-4 2-7 0Z" fill="#d4c8ac"/>' +
+          '</svg></div>';
+      }
+      return '<article class="bed' + (current ? ' current' : '') + '" style="--flower-wash:' + plant.wash + '">' +
+        '<span class="bed-label">已种 ' + count + ' 株</span>' + illustration(plant, "bloom", true) +
+        '<h3>' + plant.name + '</h3><p>' + plant.need + ' 次专注</p></article>';
+    }).join("");
+  }
+}
+
+function finish(success, reason, id = runId) {
+  if (!id || unavailable) return;
+  try {
+    const latest = read();
+    if (latest.active?.id !== id) return;
+    const growth = latest.growth + (success ? 1 : 0);
+    const current = plants[latest.species];
+    const message = success
+      ? (growth === current.need ? current.name + "开花了！把它种进花园吧。" : "专注完成，生长进度 +1。")
+      : reason + "，本轮没有增加生长进度。";
+    if (id === runId) {
+      runId = null;
+      clearInterval(timer);
+    }
+    save({...latest, active:null, growth, completed:latest.completed + (success ? 1 : 0), message});
+  } catch {
+    storageFailure();
+  }
+}
+
+function tick() {
+  if (!runId || state.active?.id !== runId) return;
+  if (document.hidden) {
+    finish(false, "离开了专注页面");
+    return;
+  }
+  const remaining = state.active.deadline - Date.now();
+  if (remaining <= 0) finish(true);
+  else renderTime(remaining);
+}
+
+action.addEventListener("click", () => {
+  try {
+    const latest = read();
+    if (applyingUpdate || latest.active || document.hidden || latest.growth >= plants[latest.species].need) return;
+    runId = crypto.randomUUID?.() || String(Date.now()) + Math.random();
+    save({...latest, active:{id:runId, deadline:Date.now() + duration}, message:""});
+    timer = setInterval(tick, 200);
+  } catch {
+    storageFailure();
+  }
+});
+
+focusOverlay.addEventListener("cancel", event => event.preventDefault());
+stop.addEventListener("click", () => {
+  if (!runId || state.active?.id !== runId) return;
+  if (Date.now() >= state.active.deadline) return tick();
+  dialog.returnValue = "";
+  dialog.showModal();
+});
+
+dialog.addEventListener("close", () => {
+  if (dialog.returnValue !== "stop") return;
+  if (state.active && Date.now() >= state.active.deadline) tick();
+  else finish(false, "提前结束了专注");
+});
+
+plantButton.addEventListener("click", () => {
+  try {
+    const latest = read();
+    if (latest.active || latest.growth < plants[latest.species].need) return;
+    const garden = [...latest.garden];
+    garden[latest.species]++;
+    const next = garden.findIndex(count => count === 0);
+    const name = plants[latest.species].name;
+    const message = next < 0 ? name + "已种进花园。你可以继续培育喜欢的植物。" :
+      name + "已种进花园，解锁了" + plants[next].name + "。";
+    save({...latest, garden, species:next < 0 ? latest.species : next, growth:0, message});
+    action.focus();
+  } catch {
+    storageFailure();
+  }
+});
+
+plants.forEach(({name, need}, i) => {
+  const option = document.createElement("option");
+  option.value = String(i);
+  option.textContent = name + " · " + need + " 次专注";
+  picker.append(option);
+});
+picker.addEventListener("change", () => {
+  try {
+    const latest = read();
+    const species = Number(picker.value);
+    if (!plants[species] || latest.active || latest.growth || !latest.garden.every(count => count > 0)) return;
+    save({...latest, species, message:""});
+  } catch {
+    storageFailure();
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) finish(false, "离开了专注页面");
+  else tick();
+});
+window.addEventListener("blur", () => finish(false, "离开了专注页面"));
+window.addEventListener("pagehide", () => finish(false, "关闭或刷新了专注页面"));
+window.addEventListener("storage", event => {
+  if (event.key !== key && event.key !== null) return;
+  try {
+    state = read();
+    if (runId && state.active?.id !== runId) {
+      runId = null;
+      clearInterval(timer);
+    }
+    if (!unavailable) render();
+  } catch {
+    storageFailure();
+  }
+});
+try {
+  state = read();
+  if (state.active) finish(false, "上一次专注被中断", state.active.id);
+  if (!unavailable) render();
+} catch {
+  storageFailure();
+}
+
+if (location.protocol !== "file:" && "serviceWorker" in navigator) {
+  const workers = navigator.serviceWorker;
+  workers.addEventListener("controllerchange", () => {
+    if (applyingUpdate) location.reload();
+  });
+  workers.register("./sw.js", {updateViaCache:"none"}).then(registration => {
+    const showUpdate = () => {
+      updateApp.hidden = !registration.waiting || !workers.controller;
+    };
+    showUpdate();
+    registration.addEventListener("updatefound", () => {
+      registration.installing?.addEventListener("statechange", showUpdate);
+    });
+    workers.addEventListener("controllerchange", showUpdate);
+    updateApp.addEventListener("click", () => {
+      if (!registration.waiting || read().active) return;
+      applyingUpdate = true;
+      render();
+      registration.waiting.postMessage("apply-update");
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) registration.update().catch(() => {});
+    });
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>
