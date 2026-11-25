@@ -1,0 +1,5 @@
+/server-data/
+
+/node_modules/
+.DS_Store
+/*服务器登录信息

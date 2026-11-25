@@ -1,0 +1,62 @@
+#friends[hidden]{display:none}
+#mode-link[hidden]{display:none}
+#beds, #friends-members {
+  height: clamp(290px, 48vh, 430px);
+  overflow-y: auto;
+  align-content: start;
+  scrollbar-gutter: stable;
+  padding: 2px 6px 4px 2px;
+}
+#beds:focus-visible, #friends-members:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+.garden-brand-group{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;min-width:0}
+.garden-brand-group .brand{white-space:nowrap}
+.garden-brand-group:has(+ #member-profile[hidden]){flex:1;justify-content:space-between}
+#member-profile{margin-left:auto;min-width:0;max-width:60%;text-align:right}
+.member-profile-menu{position:relative}
+.member-identity{display:flex;align-items:center;justify-content:flex-end;gap:5px;min-height:40px;padding:5px 10px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:15px;color:var(--ink);overflow-wrap:anywhere;cursor:pointer;list-style:none}
+.member-identity::-webkit-details-marker{display:none}
+.member-identity::after{content:"";width:6px;height:6px;flex:none;margin-left:3px;border:solid currentColor;border-width:0 1px 1px 0;transform:translateY(-2px) rotate(45deg)}
+.member-profile-menu[open] .member-identity::after{transform:translateY(2px) rotate(225deg)}
+#current-flower-name{color:var(--ink);font-size:15px;overflow-wrap:anywhere}
+.member-actions{position:absolute;z-index:5;right:0;top:calc(100% + 6px);width:min(240px,85vw);padding:6px;display:grid;gap:2px;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:0 8px 20px #233f301a}
+.member-actions button{text-align:left}
+.member-actions button[hidden],#friends-status:empty{display:none}
+.member-actions button{border:0;border-radius:8px;background:transparent;color:var(--green);font:inherit;font-size:13px;font-weight:650;min-height:32px;padding:4px 7px}
+.member-actions button:hover{background:#e9eedf}
+#friends-status:not(:empty){font-size:13px;margin-top:4px;overflow-wrap:anywhere}
+#flower-name-dialog{width:min(360px,calc(100% - 36px))}
+#flower-name-dialog form{display:block}
+#flower-name-dialog label{display:block;font-size:13px;margin-bottom:5px}
+#flower-name-feedback:not(:empty){font-size:13px;margin-top:6px;color:var(--accent)}
+#flower-name-dialog .friend-controls{justify-content:flex-end;margin-top:14px}
+.friend-controls{display:flex;flex-wrap:wrap;gap:8px}
+#flower-name{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font:inherit}
+#flower-name:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+#friends-members:not(:empty){display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px;margin-top:13px}
+.friend{min-width:0;padding:12px;border:1px solid #dfe5d4;border-radius:12px;background:#eff1e5}
+.friend h3{font-size:15px;overflow-wrap:anywhere}
+.friend p{font-size:13px;margin-top:4px}
+.friend progress{width:100%;height:8px;accent-color:var(--green)}
+#invite-gate{display:none;width:min(420px,calc(100% - 32px));margin:10vh auto;padding:24px;border:1px solid var(--line);border-radius:20px;background:var(--card)}
+#invite-gate h1{font-size:32px;margin-bottom:12px}
+#retry-invite{margin-top:14px}
+.invite-only:not(.member-ready) #invite-gate{display:block}
+.invite-only:not(.member-ready) .garden-app{display:none}
+#friends-members:not(:empty){grid-template-columns:minmax(0,1fr);gap:8px}
+.friend{display:grid;grid-template-columns:2rem minmax(0,1fr) auto;gap:6px 10px;align-items:center}
+.friend-rank{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:#e1e9d7;color:var(--green);font-size:14px;font-weight:750;font-variant-numeric:tabular-nums}
+.friend-profile{min-width:0}
+.friend-champion{--medal:#f1d78b;--medal-edge:#caa354;--medal-ink:#63440c;background:linear-gradient(105deg,#f7e8bd,#fcf7e8);border-color:#d4b46c}
+.friend-runner-up{--medal:#dde5ea;--medal-edge:#9baeb9;--medal-ink:#394f5e;background:linear-gradient(105deg,#e6edf0,#f5f7f6);border-color:#b7c6cc}
+.friend-third{--medal:#ebc6a6;--medal-edge:#bf8b68;--medal-ink:#6a412b;background:linear-gradient(105deg,#f4dfcd,#fcf3e9);border-color:#d8ae90}
+.friend-champion{--ribbon:#a33f32}
+.friend-runner-up{--ribbon:#4d6b88}
+.friend-third{--ribbon:#54704f}
+.friend:is(.friend-champion,.friend-runner-up,.friend-third) .friend-rank{position:relative;isolation:isolate;margin-top:9px;background:linear-gradient(145deg,#ffffff85,transparent 65%),var(--medal);color:var(--medal-ink);border:1px solid var(--medal-edge);box-shadow:inset 0 0 0 2px #ffffff65,0 2px 3px #233f3020}
+.friend:is(.friend-champion,.friend-runner-up,.friend-third) .friend-rank::before{content:"";position:absolute;z-index:-1;top:-10px;left:50%;width:19px;height:11px;transform:translateX(-50%);background:linear-gradient(90deg,transparent 44%,#ffffff70 44% 56%,transparent 56%),var(--ribbon);clip-path:polygon(0 0,100% 0,72% 100%,28% 100%)}
+.friend-award{display:inline-block;white-space:nowrap;margin-inline-start:7px;padding:2px 7px;border-radius:999px;background:var(--medal);color:var(--medal-ink);font-size:11px;vertical-align:middle}
+.friend-total{text-align:end}
+@media(max-width:480px){.friend{grid-template-columns:2rem minmax(0,1fr)}.friend-total{grid-column:2;text-align:start}}

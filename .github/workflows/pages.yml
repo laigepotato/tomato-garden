@@ -27,9 +27,14 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Prepare site
+        env:
+          GARDEN_API_URL: ${{ vars.GARDEN_API_URL }}
         run: |
           mkdir -p dist
-          cp index.html manifest.webmanifest icon-192.png icon-512.png dist/
+          cp index.html manifest.webmanifest icon-192.png icon-512.png friends.css friends.js friends-config.js garden-catalog.js garden-art.js garden-admin.html garden-admin.js dist/
+          if [ -n "$GARDEN_API_URL" ]; then
+            node -e 'const url = new URL(process.env.GARDEN_API_URL); if (url.protocol !== "https:" || url.origin !== url.href.replace(/\/$/, "")) throw new Error("Use the HTTPS Worker origin"); process.stdout.write("window.GARDEN_API = " + JSON.stringify(url.origin) + ";\n")' > dist/friends-config.js
+          fi
           sed "s/__GARDEN_RELEASE__/${GITHUB_SHA}/g" sw.js > dist/sw.js
       - name: Upload site
         uses: actions/upload-pages-artifact@v4

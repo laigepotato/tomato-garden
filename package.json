@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "web-push": "4.0.0"
+  },
+  "type": "module"
+}

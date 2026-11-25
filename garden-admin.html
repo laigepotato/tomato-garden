@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f8f6ee">
+<title>成员链接 · 番茄花园</title>
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+:root{color-scheme:light;--ink:#233f30;--line:#dfdfd0;--green:#28553d;--paper:#f8f6ee;--card:#fffcf5}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC",sans-serif}header,main{width:min(720px,calc(100% - 32px));margin:auto}header{padding:20px 0 16px;border-bottom:1px solid var(--line)}a{color:var(--green);text-underline-offset:3px}h1{font-family:Georgia,"Songti SC",serif;margin:18px 0;font-size:clamp(28px,6vw,42px)}h2{margin:0 0 12px;font-size:19px}p{line-height:1.6}.card{border:1px solid var(--line);border-radius:18px;background:var(--card);margin:0 0 14px;padding:16px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}label{display:block;margin-bottom:7px;font-size:14px;font-weight:650}input,button{border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font:inherit;padding:8px 10px}input{flex:1;min-width:min(170px,100%)}button{cursor:pointer;font-weight:650}button:disabled{opacity:.55;cursor:default}button.primary{background:var(--green);color:white;border-color:var(--green)}:focus-visible{outline:3px solid #a84a39;outline-offset:3px}ul{list-style:none;margin:0;padding:0}li{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);padding:12px 0}li:last-child{padding-bottom:0}li strong{overflow-wrap:anywhere}li p,#notice{margin:4px 0;font-size:13px;color:#566556}main{padding-bottom:20px}
+</style>
+</head>
+<body>
+<header><a href="./index.html">← 返回番茄花园</a></header>
+<main>
+<h1>管理成员链接</h1>
+<p id="notice" role="status">正在读取花园成员。</p>
+<form id="login" class="card" hidden>
+<label for="admin-password">管理员口令</label>
+<div class="row">
+<input id="admin-password" type="password" autocomplete="current-password" required>
+<button class="primary" type="submit">登录</button>
+</div>
+</form>
+<div id="controls" hidden>
+<section class="card" aria-labelledby="new-title">
+<h2 id="new-title">生成专属链接</h2>
+<form id="create">
+<label for="nickname">好友花名</label>
+<div class="row">
+<input id="nickname" maxlength="32" placeholder="留空会随机取名">
+<button class="primary" type="submit">生成链接</button>
+</div>
+</form>
+</section>
+<section class="card" id="result" aria-labelledby="result-title" hidden>
+<h2 id="result-title"></h2>
+<label for="link">专属链接</label>
+<div class="row"><input id="link" readonly><button id="copy" type="button">复制链接</button></div>
+<p>请单独发给对应的好友。持有链接即可恢复这个身份。</p>
+</section>
+<section class="card" aria-labelledby="members-title">
+<h2 id="members-title">花园成员</h2>
+<ul id="members"></ul>
+</section>
+</div>
+</main>
+<script src="./friends-config.js"></script>
+<script src="./garden-admin.js"></script>
+</body>
+</html>

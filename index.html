@@ -15,9 +15,8 @@ header{padding:24px 0 19px;border-bottom:1px solid var(--line);display:flex;alig
 .timer-card{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 18px}.timer-card>p{font-size:13px}.dial{position:relative;width:165px;height:165px;display:grid;place-items:center;margin:14px 0}.dial svg{position:absolute;inset:0;transform:rotate(-90deg)}.dial circle{fill:none;stroke-width:4.5}.track{stroke:#eae8db}.meter{stroke:#65855e;stroke-linecap:round}.digits{font-size:48px;line-height:1;font-weight:740;font-variant-numeric:tabular-nums;letter-spacing:-.065em}.primary,.secondary{border-radius:10px;padding:10px 17px;font-weight:780}.primary{border:1px solid var(--green);background:var(--green);color:#fffdf5}.primary:hover{background:#1f4732}.primary:disabled{background:#e5e9dd;border-color:#e5e9dd;color:#596455}.secondary{background:var(--card);border:1px solid var(--line);color:var(--ink)}#action{min-width:152px}.status{min-height:2.7em;margin:10px 0 0;max-width:260px;display:grid;place-items:center}
 .garden{margin-top:18px;padding:19px 22px}.garden-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.beds{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.bed{background:#eff1e5;border:1px solid #dfe5d4;border-radius:16px;min-width:0;display:grid;justify-items:center;text-align:center;padding:8px 4px 12px}.bed .plant-art{height:92px;max-width:120px}.bed h3{font-size:14px}.bed p{font-size:12px}footer{padding:15px 0 24px;font-size:12px;color:var(--muted)}dialog{max-width:calc(100% - 36px);border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:18px;padding:22px}dialog::backdrop{background:#233f3066}dialog form{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}dialog p{margin-top:6px}
 footer a{display:inline-block;margin-inline-start:12px;color:var(--green);text-underline-offset:3px}
-.save-tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.save-tools button{font-size:12px;padding:6px 10px}
-#save-feedback:not(:empty){margin-top:6px}
+
+
 .scene{height:227px;background:radial-gradient(ellipse at 50% 43%,#fff9df 0%,#fff9df00 51%),linear-gradient(145deg,var(--flower-wash,#f4eddb),#e9efdf 86%)}
 .scene .plant-art{max-width:282px}
 .scene[data-stage="seed"] .plant-art{transform:translateY(-20px) scale(1.18)}
@@ -49,6 +48,7 @@ footer a{display:inline-block;margin-inline-start:12px;color:var(--green);text-u
   display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
   border-radius:999px;background:#f6e5da;color:#8e4635;font-size:12px;font-weight:750;
 }
+.timer-kicker[hidden]{display:none}
 .timer-kicker::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
 .timer-card h2{margin:8px 0 0;font-size:clamp(22px,6vw,30px)}
 .timer-card .dial{
@@ -86,17 +86,50 @@ body:has(.focus-overlay[open]){overflow:hidden}
   .timer-card .digits{font-size:43px}
   .beds{grid-template-columns:repeat(2,minmax(0,1fr))}.garden{margin-top:12px}.scene{height:175px}
 }
+.member-ready .settings-label,
+html:not(.member-ready) :is(.member-greeting,#edit-flower-name,#share-member){display:none}
+.member-actions .mute-setting{display:flex;align-items:center;gap:5px;min-height:32px;padding:4px 7px;font-size:13px;font-weight:650;color:var(--green);cursor:pointer}
+#push-status:not([hidden]){padding:4px 7px;font-size:13px;overflow-wrap:anywhere}
 </style>
+<link rel="stylesheet" href="./friends.css">
+<script src="./friends-config.js"></script>
 </head>
 <body>
-<header>
+<section id="invite-gate" aria-labelledby="invite-title">
+<h1 id="invite-title">番茄花园</h1>
+<p id="invite-status" role="status">请使用管理员发给你的专属链接。</p>
+<form id="invite-link-form">
+<label for="invite-link">从主屏幕打开时，可粘贴你的专属链接</label>
+<input id="invite-link" type="url" required autocomplete="off" spellcheck="false" style="display:block;width:100%;margin:8px 0;padding:8px">
+<button class="primary" type="submit">打开我的花园</button>
+</form>
+<button class="secondary" id="retry-invite" type="button" hidden>重试</button>
+</section>
+<header class="garden-app">
+<div class="garden-brand-group">
 <div class="brand"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 11c-3-2-8-3-11 2-4 7 3 14 11 14s15-7 11-14c-3-5-8-4-11-2z"/><path fill="#3e6747" d="M16 12c-4 0-7-2-8-4 3-1 6 0 8 2-1-3 0-5 2-7l1 1c-1 2-2 4-1 6 2-2 5-2 7-1-2 2-5 3-9 3z"/></svg>番茄花园</div>
 <div class="badge" id="total">累计专注 0 次</div>
+</div>
+<section id="member-profile" aria-label="花园设置">
+<details class="member-profile-menu">
+<summary class="member-identity"><span class="member-greeting">Hi～ <strong id="current-flower-name"></strong></span><span class="settings-label">设置</span></summary>
+<div class="member-actions">
+<button id="edit-flower-name" type="button" aria-haspopup="dialog">改名</button>
+<button id="share-member" type="button">复制专属链接</button>
+<button id="restore-member" type="button" hidden>恢复云端进度</button>
+<p id="friends-status" role="status"></p>
+<button type="button" id="enable-push" hidden>开启到点通知</button>
+<label class="mute-setting"><input type="checkbox" id="mute-focus"> 静音模式</label>
+<button type="button" id="update-app" hidden>应用更新</button>
+<p id="push-status" role="status" hidden></p>
+</div>
+</details>
+</section>
 </header>
-<main>
+<main class="garden-app">
 <section class="intro">
 <div class="eyebrow">从一粒种子开始</div>
-<h1>静静的时光，也会开花</h1>
+<h1>静静耕耘，花会开～</h1>
 <p id="intro-text">每完成一次 25 分钟专注，植物就长大一点。养成后，把它种进自己的花园。</p>
 </section>
 <div class="grid">
@@ -108,7 +141,7 @@ body:has(.focus-overlay[open]){overflow:hidden}
 <div class="segments" id="progress" role="progressbar" aria-label="生长进度" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0"></div>
 <p class="hint" id="growth-hint">再完成 3 次专注，小雏菊就会开花。</p>
 <div class="plant-controls" id="plant-controls" hidden><button class="primary" id="plant">种进花园</button></div>
-<div class="plant-controls" id="species-controls" hidden><label for="species">下一株想养</label><select id="species"></select></div>
+<div class="plant-controls" id="species-controls" hidden><label for="species">下一个图鉴条目</label><select id="species"></select></div>
 </div>
 </section>
 <section class="card focus-entry" aria-labelledby="focus-title">
@@ -122,19 +155,16 @@ body:has(.focus-overlay[open]){overflow:hidden}
 </section>
 </div>
 <section class="card garden" aria-labelledby="garden-title">
-<div class="garden-head"><h2 id="garden-title">我的花园</h2><div class="badge" id="garden-count">0 株植物</div></div>
-<div class="beds" id="beds"></div>
+<div class="garden-head"><h2 id="garden-title">我的花园</h2><div class="badge"><span id="garden-count">已收集 植物 0 种</span> · <span id="garden-animals">动物 0 只</span></div></div>
+<div class="beds" id="beds" tabindex="0" role="region" aria-labelledby="garden-title"></div>
+</section>
+<section class="card garden" id="friends" aria-labelledby="friends-title" hidden>
+<div class="garden-head"><h2 id="friends-title">好友花园排行榜</h2></div>
+<div id="friends-members" tabindex="0" role="region" aria-labelledby="friends-title"></div>
 </section>
 </main>
-<footer>
-进度保存在当前浏览器里。<a id="mode-link" href="?mode=test">进入测试模式（每次 5 秒）</a>
-<div class="save-tools">
-<button class="secondary" id="export-save">导出花园</button>
-<button class="secondary" id="import-save">导入花园</button>
-<input id="save-file" type="file" accept=".json,application/json" hidden>
-<button class="secondary" id="update-app" hidden>应用更新</button>
-</div>
-<p id="save-feedback" role="status"></p>
+<footer class="garden-app">
+<a id="mode-link" href="?" hidden>返回正式模式（每次 25 分钟）</a>
 </footer>
 <dialog class="focus-overlay" id="focus-overlay" aria-labelledby="timer-title">
 <div class="timer-card">
@@ -155,27 +185,64 @@ body:has(.focus-overlay[open]){overflow:hidden}
 <svg viewBox="0 0 165 165" aria-hidden="true"><circle class="track" cx="82.5" cy="82.5" r="78"/><circle class="meter" id="meter" cx="82.5" cy="82.5" r="78" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"/></svg>
 <div class="digits" id="time" role="timer">25:00</div>
 </div>
-<p class="focus-note">保持页面在前台，专注完成后植物会生长。</p>
+<p class="focus-note">专注完成后，植物会生长。</p>
 <button class="secondary" id="stop" aria-haspopup="dialog">提前结束</button>
+<button class="primary" id="confirm-completion" hidden>确认</button>
 </div>
 </dialog>
 <dialog id="confirm" aria-labelledby="confirm-title"><h2 id="confirm-title">结束这轮专注？</h2><p>本轮不会增加生长进度。</p><form method="dialog"><button class="secondary" value="keep" autofocus>继续专注</button><button class="primary" value="stop">结束本轮</button></form></dialog>
+<dialog id="recover-focus" aria-labelledby="recover-title">
+<h2 id="recover-title">上一轮专注</h2>
+<p id="recover-description"></p>
+<form method="dialog">
+<button class="secondary" value="discard" autofocus>本轮未完成</button>
+<button class="primary" id="recover-accept" value="accept">继续专注</button>
+</form>
+</dialog>
+<dialog id="flower-name-dialog" aria-labelledby="flower-name-title">
+<h2 id="flower-name-title">修改花名</h2>
+<form id="friends-form">
+<label for="flower-name">新花名</label>
+<input id="flower-name" maxlength="32" autocomplete="nickname" required autofocus>
+<p id="flower-name-feedback" role="status"></p>
+<div class="friend-controls">
+<button class="secondary" id="random-name" type="button">随机取名</button>
+<button class="secondary" id="cancel-flower-name" type="button">取消</button>
+<button class="primary" id="friends-submit" type="submit">保存</button>
+</div>
+</form>
+</dialog>
+<script src="./garden-catalog.js"></script>
+<script src="./garden-art.js"></script>
 <script>
 const plants = [
   {kind:"daisy", name:"小雏菊", need:3, petal:"#fffcf0", wash:"#f3efdb"},
   {kind:"cornflower", name:"矢车菊", need:4, petal:"#7286cc", wash:"#e6eaf6"},
   {kind:"calendula", name:"金盏花", need:5, petal:"#eca250", wash:"#fae9d2"},
-  {kind:"lavender", name:"薰衣草", need:6, petal:"#9c7fb5", wash:"#eee7f4"},
+  {kind:"lavender", name:"薰衣草", need:5, petal:"#9c7fb5", wash:"#eee7f4"},
   {kind:"tulip", name:"郁金香", need:5, petal:"#db7188", wash:"#f6e2e4"},
-  {kind:"hydrangea", name:"绣球花", need:6, petal:"#9b9dd1", wash:"#e4eaf7"},
-  {kind:"cosmos", name:"波斯菊", need:7, petal:"#e68bac", wash:"#f6e7ed"},
-  {kind:"sunflower", name:"向日葵", need:8, petal:"#efbd43", wash:"#f8edce"}
+  {kind:"hydrangea", name:"绣球花", need:5, petal:"#9b9dd1", wash:"#e4eaf7"},
+  {kind:"cosmos", name:"波斯菊", need:5, petal:"#e68bac", wash:"#f6e7ed"},
+  {kind:"sunflower", name:"向日葵", need:5, petal:"#efbd43", wash:"#f8edce"},
+  {kind:"rose", name:"玫瑰", need:5, petal:"#d76a82", wash:"#f6e1e4"},
+  {kind:"poppy", name:"虞美人", need:5, petal:"#ec745a", wash:"#f8e8dc"},
+  {kind:"lily", name:"百合", need:5, petal:"#fff3de", wash:"#f6efdc"},
+  {kind:"iris", name:"鸢尾", need:5, petal:"#8f83d0", wash:"#ece7f5"},
+  {kind:"daffodil", name:"洋水仙", need:5, petal:"#f7d977", wash:"#f7efcf"},
+  {kind:"sakura", name:"樱花", need:5, petal:"#efb2c7", wash:"#f7e8ee"},
+  {kind:"peony", name:"牡丹", need:5, petal:"#e99ba8", wash:"#fae6e7"},
+  {kind:"camellia", name:"山茶", need:5, petal:"#de796c", wash:"#f6e5dc"},
+  {kind:"bluebell", name:"蓝铃花", need:5, petal:"#8395ce", wash:"#e9edf7"},
+  {kind:"orchid", name:"蝴蝶兰", need:5, petal:"#cd8fbc", wash:"#f1e6f3"},
+  {kind:"lotus", name:"荷花", need:5, petal:"#ef9db5", wash:"#ebf0e1"},
+  {kind:"forget-me-not", name:"勿忘我", need:5, petal:"#82a9db", wash:"#e6eff6"},
+  ...gardenCatalog
 ];
 const testMode = new URLSearchParams(location.search).get("mode") === "test";
 const duration = testMode ? 5 * 1000 : 25 * 60 * 1000;
 const key = testMode ? "tomato-garden-test-v1" : "tomato-garden-v1";
 const empty = {species:0, growth:0, completed:0, garden:plants.map(() => 0), active:null, message:""};
-const defaultMessage = "专注期间离开页面、切屏或关闭，本轮不会增加进度。";
+const defaultMessage = "切换 App 或标签页时会继续计时。重新打开页面后，可以确认上一轮专注。";
 const byId = id => document.getElementById(id);
 const action = byId("action");
 const focusOverlay = byId("focus-overlay");
@@ -183,14 +250,13 @@ const stop = byId("stop");
 const plantButton = byId("plant");
 const picker = byId("species");
 const dialog = byId("confirm");
-const exportSave = byId("export-save");
-const importSave = byId("import-save");
-const saveFile = byId("save-file");
-const feedback = byId("save-feedback");
 const updateApp = byId("update-app");
-const saveMode = testMode ? "test" : "normal";
 let state = empty;
 let runId = null;
+let awaitingCompletion = false;
+const confirmCompletion = byId("confirm-completion");
+const recovery = byId("recover-focus");
+let recoveryTimer;
 let timer;
 let unavailable = false;
 let gardenRendered = "";
@@ -198,89 +264,49 @@ let applyingUpdate = false;
 
 if (testMode) {
   document.title = "番茄花园 · 测试模式";
-  byId("intro-text").textContent = "每轮 5 秒，快速体验养花和移栽。测试进度单独保存。";
+  byId("intro-text").textContent = "每轮 5 秒，快速体验花园图鉴。测试进度单独保存。";
   byId("timer-kicker").textContent = "专注中 · 测试模式";
   byId("timer-description").textContent = "测试模式 · 每次 5 秒";
   const modeLink = byId("mode-link");
-  modeLink.href = "?";
-  modeLink.textContent = "返回正式模式（每次 25 分钟）";
+  const normalUrl = new URL(location.href);
+  normalUrl.searchParams.delete("mode");
+  modeLink.href = normalUrl.href;
+  modeLink.hidden = document.documentElement.classList.contains("push-test");
 }
 
 function read() {
   const saved = localStorage.getItem(key);
   if (!saved) return empty;
-  return migrate({...empty, ...JSON.parse(saved)});
+  const previous = {...empty, ...JSON.parse(saved)};
+  const progress = migrate(previous);
+  if (previous.garden.length !== progress.garden.length) {
+    localStorage.setItem(key, JSON.stringify(progress));
+  }
+  return progress;
+}
+
+const fixedStarterCount = 3;
+
+function nextSpecies(garden) {
+  const starter = garden.slice(0, fixedStarterCount).findIndex(count => count === 0);
+  if (starter >= 0) return starter;
+  const remaining = garden.flatMap((count, index) => count === 0 ? [index] : []);
+  return remaining.length ? remaining[Math.floor(Math.random() * remaining.length)] : -1;
 }
 
 function migrate(previous) {
-  if (previous.garden.length === plants.length) return previous;
+  const growth = Math.min(previous.growth, plants[previous.species].need);
+  if (previous.garden.length === plants.length) return {...previous, growth};
   const garden = plants.map((_, i) => previous.garden[i] ?? 0);
-  const next = garden.findIndex(count => count === 0);
   const hasFinishedOldCollection = previous.garden.every(count => count > 0);
-  const canSwitchToNewPlant = hasFinishedOldCollection && next >= 0 && !previous.growth && !previous.active;
-  return {...previous, garden, species:canSwitchToNewPlant ? next : previous.species};
+  const next = hasFinishedOldCollection && !growth && !previous.active ? nextSpecies(garden) : -1;
+  return {...previous, garden, growth, species:next < 0 ? previous.species : next};
 }
 
 function backupProgress({species, growth, completed, garden}) {
   return {species, growth, completed, garden};
 }
 
-function parseBackup(text) {
-  const backup = JSON.parse(text);
-  if (backup?.format !== "tomato-garden" || backup.version !== 1) {
-    throw new Error("请选择番茄花园导出的存档。");
-  }
-  if (backup.mode !== saveMode) {
-    throw new Error(testMode ? "请切回正式模式导入这份存档。" : "请切换到测试模式导入这份存档。");
-  }
-  const {species, growth, completed, garden} = backup.progress ?? {};
-  const validCount = value => Number.isSafeInteger(value) && value >= 0;
-  if (!validCount(species) || !plants[species] || !Array.isArray(garden) ||
-      ![4, plants.length].includes(garden.length) || species >= garden.length ||
-      !garden.every(validCount) || !validCount(growth) || growth > plants[species].need ||
-      !validCount(completed) || completed < growth) {
-    throw new Error("存档中的花园进度无效。");
-  }
-  return migrate({...empty, species, growth, completed, garden});
-}
-
-exportSave.addEventListener("click", () => {
-  try {
-    const progress = backupProgress(read());
-    const backup = {format:"tomato-garden", version:1, mode:saveMode, progress};
-    const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], {type:"application/json"}));
-    const link = document.createElement("a");
-    link.href = url;
-    const date = new Date().toISOString().slice(0, 10);
-    link.download = "番茄花园-" + (testMode ? "测试-" : "") + date + ".json";
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    feedback.textContent = "花园存档已生成。";
-  } catch {
-    feedback.textContent = "无法导出花园，请检查浏览器的本地存储。";
-  }
-});
-
-importSave.addEventListener("click", () => saveFile.click());
-saveFile.addEventListener("change", async () => {
-  const file = saveFile.files[0];
-  saveFile.value = "";
-  if (!file) return;
-  try {
-    if (file.size > 65536) throw new Error("请选择番茄花园导出的存档。");
-    const incoming = parseBackup(await file.text());
-    const current = read();
-    if (current.active || applyingUpdate) throw new Error("请在本轮专注或更新结束后导入。");
-    if (current.completed || current.growth || current.garden.some(Boolean)) {
-      if (!window.confirm("导入会用文件里的花园替换当前进度。要继续吗？")) return;
-    }
-    if (read().active) throw new Error("请在本轮专注结束后导入。");
-    save({...incoming, message:"花园存档已恢复。"});
-    feedback.textContent = "已导入花园存档。";
-  } catch (error) {
-    feedback.textContent = error instanceof SyntaxError ? "请选择有效的花园存档文件。" : error.message;
-  }
-});
 
 function storageFailure() {
   unavailable = true;
@@ -301,6 +327,7 @@ function save(next) {
   localStorage.setItem(key, JSON.stringify(next));
   state = next;
   render();
+  window.gardenFriends?.progressChanged();
 }
 
 function petals(count, markup, offset = 0) {
@@ -347,6 +374,40 @@ function bloom(plant) {
         '<circle r="13" fill="#734c34" stroke="#c47a39" stroke-width="2"/>' +
         petals(14, '<circle cy="-9.4" r="1.1" fill="#c89455"/><circle cx="1" cy="-6.4" r=".8" fill="#a67546"/>') +
         petals(7, '<circle cy="-3" r=".85" fill="#c28b51"/>');
+    case "rose":
+    case "peony":
+    case "camellia":
+      return petals(plant.kind === "peony" ? 9 : 6, '<ellipse cy="-12" rx="12" ry="15" fill="' + plant.petal + '" stroke="#7a3651" stroke-opacity=".3"/>') +
+        petals(7, '<path d="M0 5Q-16-4-9-16Q3-22 10-13Q14-4 0 5Z" fill="' + plant.petal + '" stroke="#fff" stroke-opacity=".36"/>', 24) +
+        (plant.kind === "camellia" ? petals(8, '<circle cy="-4" r="1.6" fill="#f9d771"/>') :
+          '<path d="M0 1Q-7-7 3-8Q13-5 7 3Q0 12-9 4" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2"/>');
+    case "poppy":
+      return petals(4, '<path d="M0 4Q-18-1-19-16Q-12-34 0-24Q13-34 19-16Q18-1 0 4Z" fill="' + plant.petal + '" stroke="#a94339" stroke-width=".6"/>') +
+        '<circle r="8" fill="#4a2e37"/>' + petals(10, '<circle cy="-7" r="1.3" fill="#d39174"/>');
+    case "lily":
+    case "iris":
+    case "lotus":
+      return petals(plant.kind === "iris" ? 3 : 6, '<path d="M0 5Q-16-9 0-29Q16-9 0 5Z" fill="' + plant.petal + '" stroke="#655075" stroke-opacity=".33"/><path d="M0-2V-20" stroke="#fff" stroke-opacity=".65"/>') +
+        petals(plant.kind === "lotus" ? 7 : 3, '<path d="M0 3Q-10-3 0-19Q10-3 0 3Z" fill="' + plant.petal + '" stroke="#fff" stroke-opacity=".7"/>', 26) +
+        petals(6, '<circle cy="-5" r="1.8" fill="#e8b247"/>');
+    case "daffodil":
+      return petals(6, '<path d="M0 2Q-12-3-9-20Q0-31 9-20Q12-3 0 2Z" fill="' + plant.petal + '"/>') +
+        '<circle r="12" fill="#efa941" stroke="#ffde75" stroke-width="2"/><circle r="6" fill="#d4792e"/>';
+    case "sakura":
+      return petals(5, '<path d="M0 2Q-14-7-11-19Q-7-27-2-24L0-19 3-24Q10-26 12-19Q14-7 0 2Z" fill="' + plant.petal + '" stroke="#c96c88" stroke-width=".6"/>') +
+        petals(8, '<path d="M0 0V-8" stroke="#d17393"/><circle cy="-9" r="1.2" fill="#a95778"/>');
+    case "bluebell":
+      return '<path d="M0 13Q-2-14 15-23M0 8Q-12 0-20-12" fill="none" stroke="#67885c" stroke-width="2"/>' +
+        [[-20,-12,-24],[4,-17,14],[16,-23,24],[13,-4,20]].map(([x,y,angle]) =>
+          '<path transform="translate(' + x + ' ' + y + ') rotate(' + angle + ')" d="M-5 0Q0-5 5 0Q6 9 10 12Q0 18-10 12Q-6 9-5 0Z" fill="' + plant.petal + '" stroke="#55569a" stroke-width=".7"/>').join("");
+    case "orchid":
+      return petals(3, '<ellipse cy="-14" rx="8" ry="15" fill="' + plant.petal + '" stroke="#95578c" stroke-width=".75"/>', 60) +
+        '<path d="M0-3C-10-26-31-9-22 0Q-16 10 0 1C10-15 29-12 24 1Q17 12 0 1Z" fill="#e6a7d0"/><path d="M-9 4Q0-3 9 4Q12 14 0 17Q-12 14-9 4Z" fill="#ad527f"/><circle cy="5" r="3" fill="#f6d977"/>';
+    case "forget-me-not":
+      return [[-17,-5],[-5,-19],[13,-13],[19,5],[-6,7]].map(([x,y]) =>
+        '<g transform="translate(' + x + ' ' + y + ')">' +
+        petals(5, '<circle cy="-5" r="4.5" fill="' + plant.petal + '" stroke="#6288b2" stroke-width=".4"/>') +
+        '<circle r="2.6" fill="#f9df78"/></g>').join("");
   }
 }
 
@@ -364,6 +425,7 @@ function illustration(plant, stage, miniature = false) {
   const viewBox = miniature ? "42 8 116 146" : "0 0 200 160";
   const soil = '<ellipse cx="100" cy="139" rx="45" ry="9" fill="#d5debd"/><ellipse cx="100" cy="136" rx="29" ry="6.5" fill="#ac8966"/><path d="M78 136l5-1m7 4 4 1m14-5 5 1" stroke="#d7b888" stroke-linecap="round"/><path d="M64 138l-4-5m5 5 3-7m68 8 4-5m-5 5-2-5" stroke="#91a574" fill="none" stroke-linecap="round"/>';
   const pot = '<ellipse cx="100" cy="150" rx="51" ry="7" fill="#6e7254" opacity=".13"/><path d="M71 114h58l-7 29q-22 9-44 0Z" fill="#bd795f" stroke="#a9644d" stroke-width="1.2"/><path d="M76 118h22l-1 30q-12-1-19-5Z" fill="#e6a387" opacity=".7"/><path d="M81 127q18 5 38 0m-36 6q17 5 34 0" stroke="#ebad90" fill="none" stroke-width=".9" opacity=".8"/><ellipse cx="100" cy="112" rx="34" ry="9" fill="#e0a38a" stroke="#a9644d" stroke-width="1.2"/><ellipse cx="100" cy="111" rx="28" ry="5.8" fill="#957053"/>';
+  if (plant.category) return catalogIllustration(plant, stage, miniature, soil, pot);
   let growth;
   if (stage === "seed") {
     growth = '<path d="M93 109Q98 102 107 106 107 114 97 114 94 113 93 109Z" fill="#624731"/><path d="M96 110q4-4 8-3" fill="none" stroke="#ceac7e" stroke-width="1.15" stroke-linecap="round"/>';
@@ -387,6 +449,32 @@ function renderTime(remaining) {
   byId("meter").setAttribute("stroke-dashoffset", String(100 * (1 - Math.max(0, Math.min(duration, remaining)) / duration)));
 }
 
+const flowerLabels = {
+  phases:{seed:"种子", sprout:"发芽", bud:"花苞", bloom:"开花了"},
+  goal:"就会开花", ready:"这株已经养成，可以移栽到花园了。", button:"种进花园",
+  waiting:"等待移栽", done:"开花了！把它种进花园吧。", saved:"已种进花园", unit:"株"
+};
+const harvestLabels = {
+  phases:{seed:"待培育", sprout:"萌芽", bud:"生长中", bloom:"可以收获"},
+  goal:"就可以收获", ready:"已经成熟，可以收获并收入图鉴了。", button:"收获",
+  waiting:"等待收获", done:"成熟了！来收获吧。", saved:"已收获", unit:"份"
+};
+const animalLabels = {
+  phases:{seed:"静候来访", sprout:"发现踪迹", bud:"逐渐靠近", bloom:"来访了"},
+  goal:"就会来访", ready:"小动物来访了，可以记入图鉴。", button:"记录来访",
+  waiting:"等待记录", done:"来访了！把这次相遇记入图鉴吧。", saved:"已记录来访", unit:"次"
+};
+const foliageLabels = {
+  ...flowerLabels, phases:{seed:"种子", sprout:"萌芽", bud:"生长中", bloom:"长成了"},
+  goal:"就会长成", done:"长成了！把它种进花园吧。"
+};
+
+function gardenLabels(plant) {
+  if (plant.animal) return animalLabels;
+  if (plant.harvest) return harvestLabels;
+  return !plant.category || plant.category === "flower" ? flowerLabels : foliageLabels;
+}
+
 function render() {
   const current = plants[state.species];
   const ready = state.growth >= current.need;
@@ -394,10 +482,10 @@ function render() {
   const localRun = active && state.active.id === runId;
   const allUnlocked = state.garden.every(count => count > 0);
   const phase = ready ? "bloom" : state.growth === 0 ? "seed" : state.growth < Math.ceil(current.need / 2) ? "sprout" : "bud";
-  const phaseNames = {seed:"种子", sprout:"发芽", bud:"花苞", bloom:"开花了"};
+  const labels = gardenLabels(current);
   byId("total").textContent = "累计专注 " + state.completed + " 次";
   byId("plant-title").textContent = current.name;
-  byId("stage").textContent = phaseNames[phase];
+  byId("stage").textContent = labels.phases[phase];
   const scene = byId("scene");
   scene.style.setProperty("--flower-wash", current.wash);
   scene.setAttribute("data-stage", phase);
@@ -406,19 +494,28 @@ function render() {
   byId("progress").setAttribute("aria-valuemax", current.need);
   byId("progress").setAttribute("aria-valuenow", state.growth);
   byId("progress").innerHTML = Array.from({length:current.need}, (_, i) => i < state.growth ? '<i class="filled"></i>' : "<i></i>").join("");
-  byId("growth-hint").textContent = ready ? "这株已经养成，可以移栽到花园了。" :
-    "再完成 " + (current.need - state.growth) + " 次专注，" + current.name + "就会开花。";
+  byId("growth-hint").textContent = ready ? labels.ready :
+    "再完成 " + (current.need - state.growth) + " 次专注，" + current.name + labels.goal + "。";
+  plantButton.textContent = labels.button;
   byId("plant-controls").hidden = !ready;
   byId("species-controls").hidden = !allUnlocked || ready || active || state.growth > 0;
   picker.value = String(state.species);
   action.disabled = unavailable || ready || active || applyingUpdate;
-  importSave.disabled = active || applyingUpdate;
   updateApp.disabled = active || applyingUpdate;
-  action.textContent = ready ? "等待移栽" : "开始专注";
+  action.textContent = ready ? labels.waiting : "开始专注";
   byId("status").textContent = active && !localRun ? "另一个页面正在专注。" : state.message || defaultMessage;
-  if (localRun) {
-    renderTime(state.active.deadline - Date.now());
+  if (localRun || awaitingCompletion) {
+    renderTime(awaitingCompletion ? 0 : state.active.deadline - Date.now());
+    byId("timer-title").textContent = awaitingCompletion ? "恭喜完成一次专注" : "给花园一点时间";
+    byId("timer-kicker").hidden = awaitingCompletion;
+    stop.hidden = awaitingCompletion;
+    const showConfirmation = awaitingCompletion && confirmCompletion.hidden;
+    confirmCompletion.hidden = !awaitingCompletion;
     if (!focusOverlay.open) focusOverlay.showModal();
+    if (showConfirmation) {
+      if (dialog.open) dialog.close();
+      confirmCompletion.focus();
+    }
   } else if (focusOverlay.open) {
     closeFocus();
     if (!document.hidden && ready) plantButton.focus();
@@ -427,9 +524,15 @@ function render() {
   const gardenKey = state.garden.join(",") + ":" + state.species;
   if (gardenKey !== gardenRendered) {
     gardenRendered = gardenKey;
-    byId("garden-count").textContent = state.garden.reduce((sum, count) => sum + count, 0) + " 株植物";
-    byId("beds").innerHTML = plants.map((plant, i) => {
-      const count = state.garden[i];
+    const beds = byId("beds");
+    const flowerBeds = plants.map((plant, i) => ({plant, i, count:state.garden[i]}));
+    const discovered = flowerBeds.filter(({plant, count}) => !plant.animal && count > 0).length;
+    byId("garden-count").textContent = "已收集 植物 " + discovered + " 种";
+    const animals = flowerBeds.reduce((total, {plant, count}) => total + (plant.animal ? count : 0), 0);
+    byId("garden-animals").textContent = "动物 " + animals + " 只";
+    const unlocked = flowerBeds.filter(({count}) => count > 0);
+    const emptyBeds = flowerBeds.filter(({count}) => !count).slice(0, Math.max(4 - unlocked.length, 1));
+    beds.innerHTML = unlocked.concat(emptyBeds).map(({plant, i, count}) => {
       const current = i === state.species;
       if (!count) {
         return '<div class="bed empty" aria-hidden="true"><svg class="empty-bed-art" viewBox="0 0 120 72">' +
@@ -442,10 +545,128 @@ function render() {
           '<path d="M20 54q2-4 6-3 3 1 3 4-6 2-9-1Zm59 4q3-5 7-3 2 1 2 3-5 3-9 0Zm18-16q1-3 4-3 2 1 3 3-4 2-7 0Z" fill="#d4c8ac"/>' +
           '</svg></div>';
       }
+      const {saved, unit} = gardenLabels(plant);
       return '<article class="bed' + (current ? ' current' : '') + '" style="--flower-wash:' + plant.wash + '">' +
-        '<span class="bed-label">已种 ' + count + ' 株</span>' + illustration(plant, "bloom", true) +
+        '<span class="bed-label">' + saved + ' ' + count + ' ' + unit + '</span>' + illustration(plant, "bloom", true) +
         '<h3>' + plant.name + '</h3><p>' + plant.need + ' 次专注</p></article>';
     }).join("");
+    beds.scrollTop = 0;
+  }
+}
+
+const enablePush = byId("enable-push");
+const pushStatus = byId("push-status");
+let pushSubscription;
+let pushRequest;
+
+function showPushStatus(message) {
+  pushStatus.hidden = !message;
+  pushStatus.textContent = message;
+}
+
+async function pushApi(route, data) {
+  const response = await fetch("./api/push/" + route, data ? {
+    method:"POST", keepalive:true, headers:{"Content-Type":"application/json"}, body:JSON.stringify(data)
+  } : {cache:"no-store"});
+  if (!response.ok) throw new Error("Push request failed");
+  return response;
+}
+
+async function setupPush(registration) {
+  if (!registration.pushManager || !window.Notification) return;
+  try {
+    const {publicKey, test} = await (await pushApi("config")).json();
+    if (test !== testMode) return;
+    pushSubscription = await registration.pushManager.getSubscription();
+    enablePush.hidden = Notification.permission === "granted" && !!pushSubscription;
+    if (enablePush.hidden) showPushStatus("已开启到点通知");
+    enablePush.addEventListener("click", async () => {
+      enablePush.disabled = true;
+      try {
+        // Subscribe directly from the tap so iOS can show its permission prompt.
+        pushSubscription = await registration.pushManager.subscribe({
+          userVisibleOnly:true, applicationServerKey:publicKey
+        });
+        enablePush.hidden = true;
+        showPushStatus("已开启到点通知，从下一轮专注开始生效。");
+      } catch {
+        showPushStatus(Notification.permission === "denied"
+          ? "通知权限已关闭，请在系统设置中开启。"
+          : "暂时无法开启通知。iPhone 请从主屏幕图标打开后再试。");
+      } finally {
+        enablePush.disabled = false;
+      }
+    });
+  } catch {
+    // Local and static deployments can use the timer without a push server.
+  }
+}
+
+const muteFocus = byId("mute-focus");
+const muteKey = key + ":mute";
+let focusAudio;
+let focusVolume;
+let completionVolume;
+
+try {
+  muteFocus.checked = localStorage.getItem(muteKey) === "1";
+} catch {}
+
+function updateFocusVolume() {
+  if (focusVolume) focusVolume.gain.value = muteFocus.checked ? 0 : 1;
+}
+
+muteFocus.addEventListener("change", () => {
+  updateFocusVolume();
+  try { localStorage.setItem(muteKey, muteFocus.checked ? "1" : "0"); } catch {}
+});
+
+window.addEventListener("storage", event => {
+  if (event.key !== muteKey && event.key !== null) return;
+  muteFocus.checked = event.newValue === "1";
+  updateFocusVolume();
+});
+
+async function prepareFocusAudio() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext || muteFocus.checked) return;
+  try {
+    if (!focusAudio) {
+      focusAudio = new AudioContext();
+      focusVolume = focusAudio.createGain();
+      focusVolume.connect(focusAudio.destination);
+      updateFocusVolume();
+    }
+    await focusAudio.resume();
+  } catch {
+    // Audio availability does not affect the timer.
+  }
+}
+
+async function playCompletionChime() {
+  if (!focusAudio || muteFocus.checked) return;
+  try {
+    await focusAudio.resume();
+    if (!awaitingCompletion || muteFocus.checked) return;
+    completionVolume = focusAudio.createGain();
+    completionVolume.connect(focusVolume);
+    const start = focusAudio.currentTime;
+    const melody = [60, 64, 67, 72, 71, 67, 64, 67, 62, 65, 69, 74, 72, 67, 64, 60];
+    melody.forEach((pitch, index) => {
+      const note = focusAudio.createOscillator();
+      const volume = focusAudio.createGain();
+      const time = start + index * 0.45;
+      const length = index === melody.length - 1 ? 1.25 : 0.7;
+      note.frequency.value = 440 * 2 ** ((pitch - 69) / 12);
+      volume.gain.setValueAtTime(0.001, time);
+      volume.gain.exponentialRampToValueAtTime(0.15, time + 0.02);
+      volume.gain.exponentialRampToValueAtTime(0.001, time + length);
+      note.connect(volume).connect(completionVolume);
+      note.start(time);
+      note.stop(time + length);
+    });
+  } catch {
+    // Keep the completion recorded if the browser cannot play audio.
   }
 }
 
@@ -454,16 +675,27 @@ function finish(success, reason, id = runId) {
   try {
     const latest = read();
     if (latest.active?.id !== id) return;
-    const growth = latest.growth + (success ? 1 : 0);
     const current = plants[latest.species];
+    const growth = Math.min(latest.growth + (success ? 1 : 0), current.need);
     const message = success
-      ? (growth === current.need ? current.name + "开花了！把它种进花园吧。" : "专注完成，生长进度 +1。")
+      ? (growth === current.need ? current.name + gardenLabels(current).done : "专注完成，图鉴进度 +1。")
       : reason + "，本轮没有增加生长进度。";
     if (id === runId) {
+      awaitingCompletion = success;
       runId = null;
       clearInterval(timer);
     }
     save({...latest, active:null, growth, completed:latest.completed + (success ? 1 : 0), message});
+    if (success) void playCompletionChime();
+    else if (reason === "上一轮专注未完成") {
+      void pushApi("cancel", {token:id}).catch(() => {});
+    } else if (!pushRequest && window.Notification?.permission === "granted") {
+      void pushApi("cancel", {token:id}).catch(() => {});
+    } else if (pushRequest?.id === id) {
+      void pushRequest.scheduled.then(scheduled => {
+        if (scheduled) return pushApi("cancel", {token:id});
+      }).catch(() => showPushStatus("未能取消到点通知，本轮可能仍会收到提醒。"));
+    }
   } catch {
     storageFailure();
   }
@@ -471,10 +703,6 @@ function finish(success, reason, id = runId) {
 
 function tick() {
   if (!runId || state.active?.id !== runId) return;
-  if (document.hidden) {
-    finish(false, "离开了专注页面");
-    return;
-  }
   const remaining = state.active.deadline - Date.now();
   if (remaining <= 0) finish(true);
   else renderTime(remaining);
@@ -486,6 +714,20 @@ action.addEventListener("click", () => {
     if (applyingUpdate || latest.active || document.hidden || latest.growth >= plants[latest.species].need) return;
     runId = crypto.randomUUID?.() || String(Date.now()) + Math.random();
     save({...latest, active:{id:runId, deadline:Date.now() + duration}, message:""});
+    void prepareFocusAudio();
+    if (pushSubscription && Notification.permission === "granted") {
+      pushRequest = {
+        id:runId,
+        scheduled:pushApi("schedule", {endpoint:pushSubscription.endpoint, token:runId})
+          .then(() => {
+            showPushStatus("已开启到点通知");
+            return true;
+          }).catch(() => {
+            showPushStatus("本轮未能登记系统通知，网页计时仍在继续。");
+            return false;
+          })
+      };
+    }
     timer = setInterval(tick, 200);
   } catch {
     storageFailure();
@@ -493,6 +735,12 @@ action.addEventListener("click", () => {
 });
 
 focusOverlay.addEventListener("cancel", event => event.preventDefault());
+confirmCompletion.addEventListener("click", () => {
+  awaitingCompletion = false;
+  completionVolume?.disconnect();
+  completionVolume = null;
+  render();
+});
 stop.addEventListener("click", () => {
   if (!runId || state.active?.id !== runId) return;
   if (Date.now() >= state.active.deadline) return tick();
@@ -512,10 +760,11 @@ plantButton.addEventListener("click", () => {
     if (latest.active || latest.growth < plants[latest.species].need) return;
     const garden = [...latest.garden];
     garden[latest.species]++;
-    const next = garden.findIndex(count => count === 0);
-    const name = plants[latest.species].name;
-    const message = next < 0 ? name + "已种进花园。你可以继续培育喜欢的植物。" :
-      name + "已种进花园，解锁了" + plants[next].name + "。";
+    const next = nextSpecies(garden);
+    const plant = plants[latest.species];
+    const collected = plant.name + gardenLabels(plant).saved;
+    const message = next < 0 ? collected + "。你可以再选一个喜欢的图鉴条目。" :
+      collected + "，解锁了" + plants[next].name + "。";
     save({...latest, garden, species:next < 0 ? latest.species : next, growth:0, message});
     action.focus();
   } catch {
@@ -541,11 +790,41 @@ picker.addEventListener("change", () => {
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) finish(false, "离开了专注页面");
-  else tick();
+  if (!document.hidden) {
+    if (recovery.open) renderRecovery();
+    tick();
+  }
 });
-window.addEventListener("blur", () => finish(false, "离开了专注页面"));
-window.addEventListener("pagehide", () => finish(false, "关闭或刷新了专注页面"));
+function renderRecovery() {
+  if (!state.active) return;
+  const elapsed = Date.now() >= state.active.deadline;
+  byId("recover-description").textContent = elapsed
+    ? "上一轮计时已到点。你完成了这轮专注吗？"
+    : "上一轮计时还没结束。要继续这轮专注吗？";
+  byId("recover-accept").textContent = elapsed ? "确认完成" : "继续专注";
+}
+
+recovery.addEventListener("cancel", event => event.preventDefault());
+recovery.addEventListener("close", () => {
+  clearTimeout(recoveryTimer);
+  try {
+    const id = state.active?.id;
+    if (!id || read().active?.id !== id) return;
+    if (recovery.returnValue === "accept") {
+      runId = id;
+      void prepareFocusAudio();
+      if (Date.now() >= state.active.deadline) tick();
+      else {
+        render();
+        timer = setInterval(tick, 200);
+      }
+    } else if (recovery.returnValue === "discard") {
+      finish(false, "上一轮专注未完成", id);
+    }
+  } catch {
+    storageFailure();
+  }
+});
 window.addEventListener("storage", event => {
   if (event.key !== key && event.key !== null) return;
   try {
@@ -554,6 +833,7 @@ window.addEventListener("storage", event => {
       runId = null;
       clearInterval(timer);
     }
+    if (recovery.open && !state.active) recovery.close();
     if (!unavailable) render();
   } catch {
     storageFailure();
@@ -561,8 +841,12 @@ window.addEventListener("storage", event => {
 });
 try {
   state = read();
-  if (state.active) finish(false, "上一次专注被中断", state.active.id);
   if (!unavailable) render();
+  if (state.active) {
+    renderRecovery();
+    recovery.showModal();
+    recoveryTimer = setTimeout(renderRecovery, Math.max(0, state.active.deadline - Date.now()));
+  }
 } catch {
   storageFailure();
 }
@@ -573,8 +857,13 @@ if (location.protocol !== "file:" && "serviceWorker" in navigator) {
     if (applyingUpdate) location.reload();
   });
   workers.register("./sw.js", {updateViaCache:"none"}).then(registration => {
+    void workers.ready.then(setupPush);
     const showUpdate = () => {
       updateApp.hidden = !registration.waiting || !workers.controller;
+      if (!updateApp.hidden && !applyingUpdate && document.documentElement.matches(".invite-only:not(.member-ready)") && !read().active) {
+        applyingUpdate = true;
+        registration.waiting.postMessage("apply-update");
+      }
     };
     showUpdate();
     registration.addEventListener("updatefound", () => {
@@ -593,5 +882,6 @@ if (location.protocol !== "file:" && "serviceWorker" in navigator) {
   }).catch(() => {});
 }
 </script>
+<script src="./friends.js"></script>
 </body>
 </html>
